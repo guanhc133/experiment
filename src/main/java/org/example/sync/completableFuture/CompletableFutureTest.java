@@ -215,6 +215,11 @@ public class CompletableFutureTest {
         CompletableFuture<String> responseFuture = CompletableFuture.supplyAsync(() -> asyncCode());
         //超过2S的任务直接报异常丢弃
         CompletableFuture<String> oneSecondTimeout = failAfter(Duration.ofSeconds(2));
+        /**
+         * 原理：acceptEitherAsync取最快的返回，responseFuture耗时3S，
+         * oneSecondTimeout耗时1S，oneSecondTimeout较快，所以返回异常
+         *  这个机制可以用作并发执行多个不相关任务，凡是超过某个时间的都被抛弃不执行
+         */
         responseFuture
                 .acceptEitherAsync(oneSecondTimeout, a -> send(a))
                 .exceptionally(throwable -> {
