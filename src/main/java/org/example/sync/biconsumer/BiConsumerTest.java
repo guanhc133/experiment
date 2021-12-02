@@ -1,4 +1,4 @@
-package org.example.biconsumer;
+package org.example.sync.biconsumer;
 
 import java.util.function.Consumer;
 
