@@ -1,5 +1,6 @@
 package org.example.sync.completableFuture;
 
+import java.time.Duration;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
@@ -22,7 +23,8 @@ public class CompletableFutureTest {
 //        thenAcceptSyncExample();
 //        applyToEitherExample();
 //        runAfterBothExample();
-        thenCombineExample();
+//        thenCombineExample();
+        test();
     }
 
     /**
@@ -207,5 +209,46 @@ public class CompletableFutureTest {
     static String getString() throws InterruptedException {
         Thread.sleep(2000);
         return "completedFuture";
+    }
+
+    static void test() {
+        CompletableFuture<String> responseFuture = CompletableFuture.supplyAsync(() -> asyncCode());
+        //超过2S的任务直接报异常丢弃
+        CompletableFuture<String> oneSecondTimeout = failAfter(Duration.ofSeconds(2));
+        responseFuture
+                .acceptEitherAsync(oneSecondTimeout, a -> send(a))
+                .exceptionally(throwable -> {
+                    System.out.println("异常:" + throwable);
+                    return null;
+                });
+    }
+
+
+    public static <T> CompletableFuture<T> failAfter(Duration duration) {
+        CompletableFuture<T> promise = new CompletableFuture<>();
+        try {
+            Thread.sleep(duration.toMillis());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        final TimeoutException ex = new TimeoutException("Timeout after " + duration);
+        promise.completeExceptionally(ex);
+        return promise;
+
+    }
+
+    public static String asyncCode() {
+        try {
+            System.out.println("asyncCode");
+            Thread.sleep(3000);
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void send(String str) {
+        System.out.println("send a message:" + str);
     }
 }
