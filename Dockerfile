@@ -9,4 +9,4 @@ EXPOSE 8081
 VOLUME /tmp
 # 复制jar文件到路径
 # 启动认证服务
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","experiment-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/winstone9109439042255230481.jar"]
